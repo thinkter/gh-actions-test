@@ -1,0 +1,37 @@
+name: Download All Papers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install tqdm
+
+      - name: Download papers
+        run: python download_papers.py
+
+      - name: Create gzip archive
+        run: tar -czf papers.tar.gz papers/
+
+      - name: Show archive size
+        run: du -sh papers.tar.gz
+
+      - name: Upload archive as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: papers
+          path: papers.tar.gz
+          retention-days: 7
